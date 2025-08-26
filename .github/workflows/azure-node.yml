@@ -33,9 +33,15 @@ jobs:
           cp -r public deploy/public || true
           cp package.json deploy/
 
+      # ✅ Azure Login step
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # ✅ Deploy to Azure
       - name: Deploy to Azure WebApp
         uses: azure/webapps-deploy@v2
         with:
           app-name: nextjs-aryan-demo
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           package: deploy
