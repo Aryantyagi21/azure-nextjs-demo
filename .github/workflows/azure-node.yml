@@ -28,8 +28,10 @@ jobs:
         run: |
           mkdir -p build
           cp -r .next/standalone/* build/
-          cp -r .next/static build/.next/static
-          cp -r public build/public
+          cp -r .next/static build/.next/static || echo "No static folder to copy"
+          cp -r public build/public || echo "No public folder to copy"
+          cp package.json build/
+
 
       - name: Deploy to Azure WebApp
         uses: azure/webapps-deploy@v2
