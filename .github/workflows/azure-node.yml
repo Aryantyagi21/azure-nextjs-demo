@@ -35,6 +35,7 @@ jobs:
           cp -r public build/public
           cp package.json build/
           cp package-lock.json build/
+          cp -r node_modules build/node_modules
 
       - name: Deploy to Azure WebApp
         uses: azure/webapps-deploy@v2
