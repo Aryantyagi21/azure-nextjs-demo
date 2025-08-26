@@ -27,10 +27,10 @@ jobs:
       # Prepare deploy folder
       - name: Prepare deployment package
         run: |
-          mkdir -p deploy
+          mkdir -p deploy/.next
           cp -r .next/standalone/* deploy/
-          cp -r .next/static deploy/.next/static
-          cp -r public deploy/public
+          cp -r .next/static deploy/.next/static || true
+          cp -r public deploy/public  || true
           cp package.json deploy/
 
       # Zip it up
