@@ -1,59 +1,44 @@
-name: Deploy Next.js app to Azure
+name: Deploy Next.js to Azure
 
 on:
   push:
     branches:
-      - main
+      - main   # or master, depending on your repo
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-      - name: Set up Node.js with npm cache
-        uses: actions/setup-node@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: '20'
-          cache: 'npm'
 
-      - name: Install dependencies (retry)
-        run: |
-          for i in 1 2 3; do npm ci --prefer-offline --no-audit && break || (echo "npm ci failed, retrying..."; sleep 5); done
+      - name: Install dependencies
+        run: npm ci
 
       - name: Build Next.js app
         run: npm run build
 
-      - name: Prepare deployment package
+      - name: Prepare deployment folder
         run: |
-          set -e
-          mkdir -p deploy
-          # copy standalone server output to deploy root (this should include server.js)
+          mkdir deploy
           cp -r .next/standalone/* deploy/
-          # ensure deploy/.next exists before copying static
-          mkdir -p deploy/.next
-          cp -r .next/static deploy/.next/static || true
+          cp -r .next/static deploy/.next/
           cp -r public deploy/public || true
-          cp package.json deploy/ || true
-          cp package-lock.json deploy/ || true
-          ls -la deploy
+          cp package.json deploy/
 
-      - name: Azure Login (Service Principal)
-        uses: azure/login@v2
+      - name: Azure Login
+        uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Ensure startup command is node server.js
-        uses: azure/cli@v1
-        with:
-          inlineScript: |
-            az webapp config set --resource-group rg-nextjs-demo --name nextjs-aryan-demo --startup-file "node server.js"
-
-      - name: Deploy to Azure WebApp
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: nextjs-aryan-demo
+          app-name: nextjs-aryan-demo   # your Azure App Service name
           package: deploy
