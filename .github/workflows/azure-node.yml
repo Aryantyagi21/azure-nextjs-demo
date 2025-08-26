@@ -24,18 +24,24 @@ jobs:
       - name: Build Next.js app
         run: npm run build
 
+      # Prepare deploy folder
       - name: Prepare deployment package
         run: |
-          mkdir -p build
-          cp -r .next/standalone/* build/
-          cp -r .next/static build/.next/static || true
-          cp -r public build/public || true
-          cp package.json build/
+          mkdir -p deploy
+          cp -r .next/standalone/* deploy/
+          cp -r .next/static deploy/.next/static
+          cp -r public deploy/public
+          cp package.json deploy/
 
+      # Zip it up
+      - name: Zip artifact for deployment
+        run: zip -r release.zip deploy
 
+      # Deploy to Azure
       - name: Deploy to Azure WebApp
         uses: azure/webapps-deploy@v2
         with:
           app-name: nextjs-aryan-demo
+          package: release.zip
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
-          package: build
+          slot-name: production
