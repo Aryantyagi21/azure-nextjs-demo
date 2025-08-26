@@ -27,15 +27,9 @@ jobs:
       - name: Prepare deployment package
         run: |
           mkdir -p build
-          # Copy standalone server files
           cp -r .next/standalone/* build/
-          # Ensure .next runtime exists
-          mkdir -p build/.next
           cp -r .next/static build/.next/static
           cp -r public build/public
-          cp package.json build/
-          cp package-lock.json build/
-          cp -r node_modules build/node_modules
 
       - name: Deploy to Azure WebApp
         uses: azure/webapps-deploy@v2
